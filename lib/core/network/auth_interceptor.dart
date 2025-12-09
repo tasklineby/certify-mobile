@@ -45,6 +45,7 @@ class AuthInterceptor extends QueuedInterceptorsWrapper {
         // unless we implement a proper queue.
         // Given internal QueuedInterceptorsWrapper, we are already sequential for THIS Dio instance.
         // However, we are using a SEPARATE Dio instance for refresh.
+        return handler.reject(err);
       }
 
       try {

@@ -1,37 +1,38 @@
 import 'package:injectable/injectable.dart';
 import 'package:certify_client/core/domain/entities/verification_result.dart';
+import 'package:certify_client/features/scanner/data/models/document_model.dart';
+import 'package:certify_client/core/network/dio_client.dart';
+import 'package:dio/dio.dart';
 import '../../domain/repositories/scanner_repository.dart';
 
 @LazySingleton(as: ScannerRepository)
 class ScannerRepositoryImpl implements ScannerRepository {
+  final DioClient _dioClient;
+
+  ScannerRepositoryImpl(this._dioClient);
+
   @override
   Future<VerificationResult> verifyDocument(String qrCode) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final response = await _dioClient.dio.get(
+        '/documents/verify',
+        queryParameters: {'hash': qrCode},
+      );
 
-    final timestamp = DateTime.now();
-
-    if (qrCode.toLowerCase().contains('valid')) {
-      return VerificationResult(
-        status: VerificationStatus.valid,
-        documentId: 'DOC-${timestamp.millisecondsSinceEpoch}',
-        timestamp: timestamp,
-        message: 'Document is authentic and verified.',
-      );
-    } else if (qrCode.toLowerCase().contains('warning')) {
-      return VerificationResult(
-        status: VerificationStatus.warning,
-        documentId: 'DOC-${timestamp.millisecondsSinceEpoch}',
-        timestamp: timestamp,
-        message: 'Document valid but expires soon.',
-      );
-    } else {
-      return VerificationResult(
-        status: VerificationStatus.invalid,
-        documentId: 'UNKNOWN',
-        timestamp: timestamp,
-        message: 'Document could not be verified in the system.',
-      );
+      final document = DocumentModel.fromJson(response.data);
+      return document.toEntity();
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return VerificationResult(
+          status: VerificationStatus.invalid,
+          documentId: 'UNKNOWN',
+          timestamp: DateTime.now(),
+          message: 'Document not found in registry.',
+        );
+      }
+      throw Exception('Failed to verify document: ${e.message}');
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
     }
   }
 }

@@ -86,18 +86,48 @@ class _ScannerScreenState extends State<ScannerScreen>
         width: 32,
         height: 32,
         decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: alignment.y == -1 && alignment.x == -1
+                ? const Radius.circular(15)
+                : Radius.zero,
+            topRight: alignment.y == -1 && alignment.x == 1
+                ? const Radius.circular(15)
+                : Radius.zero,
+            bottomLeft: alignment.y == 1 && alignment.x == -1
+                ? const Radius.circular(15)
+                : Radius.zero,
+            bottomRight: alignment.y == 1 && alignment.x == 1
+                ? const Radius.circular(15)
+                : Radius.zero,
+          ),
           border: Border(
             top: alignment.y == -1
-                ? const BorderSide(color: AppColors.primary, width: 4)
+                ? const BorderSide(
+                    color: AppColors.primary,
+                    width: 5,
+                    strokeAlign: BorderSide.strokeAlignOutside,
+                  )
                 : BorderSide.none,
             bottom: alignment.y == 1
-                ? const BorderSide(color: AppColors.primary, width: 4)
+                ? const BorderSide(
+                    color: AppColors.primary,
+                    width: 5,
+                    strokeAlign: BorderSide.strokeAlignOutside,
+                  )
                 : BorderSide.none,
             left: alignment.x == -1
-                ? const BorderSide(color: AppColors.primary, width: 4)
+                ? const BorderSide(
+                    color: AppColors.primary,
+                    width: 5,
+                    strokeAlign: BorderSide.strokeAlignOutside,
+                  )
                 : BorderSide.none,
             right: alignment.x == 1
-                ? const BorderSide(color: AppColors.primary, width: 4)
+                ? const BorderSide(
+                    color: AppColors.primary,
+                    width: 5,
+                    strokeAlign: BorderSide.strokeAlignOutside,
+                  )
                 : BorderSide.none,
           ),
         ),
@@ -139,7 +169,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             left: 0,
             right: 0,
             height: topOffset,
-            child: Container(color: Colors.black.withValues(alpha: 0.6)),
+            child: Container(color: Colors.black.withValues(alpha: 0.7)),
           ),
           // Bottom
           Positioned(
@@ -147,7 +177,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             left: 0,
             right: 0,
             bottom: 0,
-            child: Container(color: Colors.black.withValues(alpha: 0.6)),
+            child: Container(color: Colors.black.withValues(alpha: 0.7)),
           ),
           // Left
           Positioned(
@@ -155,7 +185,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             left: 0,
             width: (MediaQuery.of(context).size.width - scanWindowSize) / 2,
             height: scanWindowSize,
-            child: Container(color: Colors.black.withValues(alpha: 0.6)),
+            child: Container(color: Colors.black.withValues(alpha: 0.7)),
           ),
           // Right
           Positioned(
@@ -163,7 +193,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             right: 0,
             width: (MediaQuery.of(context).size.width - scanWindowSize) / 2,
             height: scanWindowSize,
-            child: Container(color: Colors.black.withValues(alpha: 0.6)),
+            child: Container(color: Colors.black.withValues(alpha: 0.7)),
           ),
 
           // 3. Scan Border & Laser Animation
@@ -177,7 +207,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                 // Corners
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(15),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.2),
                       width: 1,
@@ -333,7 +363,9 @@ class _ScannerScreenState extends State<ScannerScreen>
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: () => viewModel.init(),
+                      onPressed: () {
+                        viewModel.resetScanner();
+                      },
                       child: const Text('Retry Permission'),
                     ),
                   ],

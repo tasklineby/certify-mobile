@@ -59,6 +59,8 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
         return AppColors.warning;
       case VerificationStatus.invalid:
         return AppColors.error;
+      case VerificationStatus.unknown:
+        return AppColors.textSecondaryLight;
     }
   }
 
@@ -70,6 +72,8 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
         return Icons.warning_rounded;
       case VerificationStatus.invalid:
         return Icons.error_rounded;
+      case VerificationStatus.unknown:
+        return Icons.help_outline_rounded;
     }
   }
 
@@ -81,12 +85,16 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
         return 'Verification Warning';
       case VerificationStatus.invalid:
         return 'Invalid Document';
+      case VerificationStatus.unknown:
+        return 'Unknown Status';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final statusColor = _getStatusColor();
+    // Filter metadata to ignore nulls
+    final validMetadata = widget.result.metadata ?? {};
 
     return Container(
       width: double.infinity,
@@ -141,6 +149,7 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Verification Message
                   Text(
                     'Verification Message',
                     style: TextStyle(
@@ -159,23 +168,78 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.access_time_rounded,
-                        size: 14,
+
+                  // Divider
+                  Divider(color: Colors.grey.shade300),
+                  const SizedBox(height: 16),
+
+                  // Document Details
+                  _buildDetailRow(
+                    context,
+                    label: 'Document ID',
+                    value: '#${widget.result.documentId}',
+                    icon: Icons.tag,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    context,
+                    label: 'Scanned at',
+                    value:
+                        '${widget.result.timestamp?.day}/${widget.result.timestamp?.month}/${widget.result.timestamp?.year} ${widget.result.timestamp?.hour}:${widget.result.timestamp?.minute.toString().padLeft(2, '0')}',
+                    icon: Icons.access_time_rounded,
+                  ),
+
+                  // Metadata Section (Dynamic)
+                  if (validMetadata.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Divider(color: Colors.grey.shade300),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Document Metadata',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textSecondaryLight,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Scanned at ${widget.result.timestamp.hour}:${widget.result.timestamp.minute.toString().padLeft(2, '0')}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondaryLight,
+                    ),
+                    const SizedBox(height: 8),
+                    ...validMetadata.entries
+                        .where((e) => e.key != "document_id")
+                        .map(
+                          (e) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.description_outlined,
+                                  size: 16,
+                                  color: AppColors.textSecondaryLight,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${_formatKey(e.key)}: ',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    e.key == "expiration_date"
+                                        ? '${(DateTime.parse(e.value as String)).day}/${(DateTime.parse(e.value as String)).month}/${(DateTime.parse(e.value as String)).year}'
+                                        : e.value.toString(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.textPrimaryLight,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -209,5 +273,49 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
         ],
       ),
     );
+  }
+
+  Widget _buildDetailRow(
+    BuildContext context, {
+    required String label,
+    required String value,
+    required IconData icon,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: AppColors.textSecondaryLight),
+        const SizedBox(width: 8),
+        Text(
+          '$label: ',
+          style: TextStyle(
+            color: AppColors.textSecondaryLight,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              color: AppColors.textPrimaryLight,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatKey(String key) {
+    // Convert snake_case to Title Case
+    return key
+        .split('_')
+        .map(
+          (word) =>
+              word.isNotEmpty ? word[0].toUpperCase() + word.substring(1) : '',
+        )
+        .join(' ');
   }
 }

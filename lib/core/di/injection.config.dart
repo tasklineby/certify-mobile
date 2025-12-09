@@ -53,9 +53,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i558.FlutterSecureStorage>(
       () => registerModule.secureStorage,
     );
-    gh.lazySingleton<_i816.ScannerRepository>(
-      () => _i419.ScannerRepositoryImpl(),
-    );
     gh.lazySingleton<_i909.LocalAuthRepository>(
       () => _i775.LocalAuthRepositoryImpl(),
     );
@@ -95,6 +92,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i787.AuthRepository>(),
         gh<_i558.FlutterSecureStorage>(),
       ),
+    );
+    gh.lazySingleton<_i816.ScannerRepository>(
+      () => _i419.ScannerRepositoryImpl(gh<_i667.DioClient>()),
     );
     gh.factory<_i52.ScannerViewModel>(
       () => _i52.ScannerViewModel(gh<_i816.ScannerRepository>()),

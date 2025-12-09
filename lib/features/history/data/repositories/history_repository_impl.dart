@@ -36,6 +36,8 @@ class HistoryRepositoryImpl implements HistoryRepository {
         return 'Document valid but expires soon.';
       case VerificationStatus.invalid:
         return 'Document verification failed.';
+      case VerificationStatus.unknown:
+        return 'Document status unknown.';
     }
   }
 }

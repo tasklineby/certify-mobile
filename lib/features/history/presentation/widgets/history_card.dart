@@ -49,7 +49,7 @@ class HistoryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  result.documentId,
+                  result.documentId ?? '',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface,
@@ -57,7 +57,7 @@ class HistoryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _formatDate(result.timestamp),
+                  _formatDate(result.timestamp ?? DateTime.now()),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondaryLight,
                   ),
@@ -84,6 +84,8 @@ class HistoryCard extends StatelessWidget {
         return Theme.of(context).statusWarning;
       case VerificationStatus.invalid:
         return Theme.of(context).statusError;
+      case VerificationStatus.unknown:
+        return AppColors.textSecondaryLight;
     }
   }
 
@@ -95,6 +97,8 @@ class HistoryCard extends StatelessWidget {
         return Icons.warning_rounded;
       case VerificationStatus.invalid:
         return Icons.error_outline_rounded;
+      case VerificationStatus.unknown:
+        return Icons.help_outline_rounded;
     }
   }
 
