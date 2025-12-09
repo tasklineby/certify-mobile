@@ -2,6 +2,8 @@ import 'package:certify_client/core/di/injection.dart';
 import 'package:certify_client/core/router/app_router.dart';
 import 'package:certify_client/core/theme/app_theme.dart';
 import 'package:certify_client/features/auth/presentation/viewmodels/auth_view_model.dart';
+import 'package:certify_client/features/history/presentation/viewmodels/history_view_model.dart';
+import 'package:certify_client/features/scanner/presentation/viewmodels/scanner_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +22,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => getIt<AuthViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<ScannerViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<HistoryViewModel>()),
       ],
       child: Builder(
         builder: (context) {

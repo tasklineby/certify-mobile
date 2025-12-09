@@ -20,6 +20,8 @@ dependencies:
   logger: ^2.0.2
   local_auth: ^2.1.6
   flutter_secure_storage: ^9.0.0
+  mobile_scanner: ^5.0.0
+  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:

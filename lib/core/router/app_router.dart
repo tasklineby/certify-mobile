@@ -1,8 +1,13 @@
 import 'package:go_router/go_router.dart';
 import 'package:certify_client/features/auth/presentation/viewmodels/auth_view_model.dart';
 import 'package:certify_client/features/auth/presentation/screens/login_screen.dart';
+import 'package:certify_client/features/scanner/presentation/screens/scanner_screen.dart';
+import 'package:certify_client/features/history/presentation/screens/history_screen.dart';
 import 'placeholders.dart'
-    hide LoginScreen; // Temporary import for placeholders
+    hide
+        LoginScreen,
+        ScannerScreen,
+        HistoryScreen; // Temporary import for placeholders
 
 /// AppRouter defines the navigation logic using GoRouter.
 class AppRouter {
