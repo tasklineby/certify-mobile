@@ -104,6 +104,7 @@ class AppTheme {
       surface: AppColors.surfaceDark,
       onSurface: AppColors.textPrimaryDark,
       error: AppColors.error,
+      outline: AppColors.textSecondaryLight,
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,

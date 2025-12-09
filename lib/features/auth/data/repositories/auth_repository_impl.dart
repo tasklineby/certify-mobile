@@ -1,58 +1,82 @@
+import 'package:certify_client/core/network/dio_client.dart';
+import 'package:certify_client/features/auth/data/models/auth_request_models.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
-import 'package:local_auth/local_auth.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 @LazySingleton(as: AuthRepository)
 class AuthRepositoryImpl implements AuthRepository {
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
-  final LocalAuthentication _localAuth = LocalAuthentication();
-  static const String _pinKey = 'user_pin_hash';
+  final DioClient _dioClient;
+  final FlutterSecureStorage _storage;
+
+  AuthRepositoryImpl(this._dioClient, this._storage);
 
   @override
-  Future<bool> checkBiometricsAvailable() async {
+  Future<void> login(String email, String password) async {
     try {
-      final canCheckBiometrics = await _localAuth.canCheckBiometrics;
-      final isDeviceSupported = await _localAuth.isDeviceSupported();
-      return canCheckBiometrics || isDeviceSupported;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  @override
-  Future<bool> authenticateWithBiometrics() async {
-    try {
-      return await _localAuth.authenticate(
-        localizedReason: 'Please authenticate to access the app',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: true,
-        ),
+      final requestDto = LoginRequestDto(email: email, password: password);
+      final response = await _dioClient.dio.post(
+        '/auth/login',
+        data: requestDto.toJson(),
       );
+
+      await _saveTokens(response.data);
     } catch (e) {
-      // Handle specific errors if needed, e.g., auth_error.notAvailable
-      return false;
+      rethrow;
     }
   }
 
   @override
-  Future<void> setPin(String pin) async {
-    // In a real app, hash this before storing!
-    // For this core setup, implementation assumes SecureStorage is safe enough.
-    // Ideally: await _storage.write(key: _pinKey, value: hash(pin));
-    await _storage.write(key: _pinKey, value: pin);
+  Future<void> register(
+    String firstName,
+    String lastName,
+    String email,
+    String password,
+  ) async {
+    try {
+      final requestDto = RegisterRequestDto(
+        email: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+        companyId: 1, // Hardcoded for now as per requirements
+      );
+      final response = await _dioClient.dio.post(
+        '/auth/register',
+        data: requestDto.toJson(),
+      );
+
+      await _saveTokens(response.data);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
-  Future<bool> verifyPin(String pin) async {
-    final storedPin = await _storage.read(key: _pinKey);
-    return storedPin == pin;
+  Future<void> logout() async {
+    try {
+      final refreshToken = await _storage.read(key: 'refresh_token');
+      if (refreshToken != null) {
+        final requestDto = LogoutRequestDto(refreshToken: refreshToken);
+        // Authorization header is auto-injected by AuthInterceptor if token exists
+        await _dioClient.dio.post('/auth/logout', data: requestDto.toJson());
+      }
+    } catch (e) {
+      // Ignore logout errors, just clear local state
+    } finally {
+      await _storage.deleteAll();
+    }
   }
 
-  @override
-  Future<bool> isPinSet() async {
-    final storedPin = await _storage.read(key: _pinKey);
-    return storedPin != null;
+  Future<void> _saveTokens(Map<String, dynamic> data) async {
+    final accessToken = data['access_token'];
+    final refreshToken = data['refresh_token'];
+
+    if (accessToken != null) {
+      await _storage.write(key: 'access_token', value: accessToken);
+    }
+    if (refreshToken != null) {
+      await _storage.write(key: 'refresh_token', value: refreshToken);
+    }
   }
 }

@@ -1,8 +1,10 @@
-/// Repository interface for Authentication operations.
 abstract class AuthRepository {
-  Future<bool> checkBiometricsAvailable();
-  Future<bool> authenticateWithBiometrics();
-  Future<void> setPin(String pin);
-  Future<bool> verifyPin(String pin);
-  Future<bool> isPinSet();
+  Future<void> login(String email, String password);
+  Future<void> register(
+    String firstName,
+    String lastName,
+    String email,
+    String password,
+  );
+  Future<void> logout();
 }

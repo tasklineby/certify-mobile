@@ -1,6 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:certify_client/features/auth/presentation/viewmodels/auth_view_model.dart';
 import 'package:certify_client/features/auth/presentation/screens/login_screen.dart';
+import 'package:certify_client/features/auth/presentation/screens/register_screen.dart';
+import 'package:certify_client/features/local_auth/presentation/viewmodels/local_auth_view_model.dart';
+import 'package:certify_client/features/local_auth/presentation/screens/local_auth_screen.dart';
 import 'package:certify_client/features/scanner/presentation/screens/scanner_screen.dart';
 import 'package:certify_client/features/history/presentation/screens/history_screen.dart';
 import 'placeholders.dart'
@@ -11,22 +15,41 @@ import 'placeholders.dart'
 
 /// AppRouter defines the navigation logic using GoRouter.
 class AppRouter {
-  // We need the AuthViewModel to make redirection decisions.
-  static GoRouter router(AuthViewModel authViewModel) {
+  static GoRouter router(
+    AuthViewModel authViewModel,
+    LocalAuthViewModel localAuthViewModel,
+  ) {
     return GoRouter(
       initialLocation: '/',
-      refreshListenable: authViewModel, // Listens to ChangeNotifier
+      refreshListenable: Listenable.merge([authViewModel, localAuthViewModel]),
       redirect: (context, state) {
-        final isAuthenticated = authViewModel.isAuthenticated;
-        final isLoginRoute = state.matchedLocation == '/login';
+        final isAuth = authViewModel.isAuthenticated;
+        final isLocalAuth = localAuthViewModel.isAuthenticated;
 
-        // If not authenticated and not on login page, go to login
-        if (!isAuthenticated) {
-          return isLoginRoute ? null : '/login';
+        final loc = state.matchedLocation;
+        final isLoginRoute = loc == '/login';
+        final isRegisterRoute = loc == '/register';
+        final isLocalAuthRoute = loc == '/local-auth';
+        final isSplash = loc == '/';
+
+        // 1. App Start / Auth Check
+        // If not authenticated (server), must go to Login (or Register)
+        if (!isAuth) {
+          // Allow access to login and register pages
+          if (isLoginRoute || isRegisterRoute) return null;
+          return '/login';
         }
 
-        // If authenticated and on login page, go to home/scanner
-        if (isAuthenticated && isLoginRoute) {
+        // 2. If Server Authenticated, check Local Auth (PIN/Bio)
+        // If not locally authenticated, must go to Local Auth screen
+        if (!isLocalAuth) {
+          if (isLocalAuthRoute) return null;
+          return '/local-auth';
+        }
+
+        // 3. If Fully Authenticated
+        // If user is still on login, register, or local-auth pages, redirect to home
+        if (isLoginRoute || isRegisterRoute || isLocalAuthRoute || isSplash) {
           return '/scanner';
         }
 
@@ -37,19 +60,22 @@ class AppRouter {
           path: '/',
           name: 'splash',
           builder: (context, state) => const SplashScreen(),
-          redirect: (context, state) {
-            // Basic splash delay logic could go here,
-            // but current auth logic handles the main check.
-            // If we are here, we are either checking auth or done.
-            // For now, let's redirect to scanner if auth'd or login if not
-            if (authViewModel.isAuthenticated) return '/scanner';
-            return '/login';
-          },
+          // Redirect logic above handles the move from splash
         ),
         GoRoute(
           path: '/login',
           name: 'login',
           builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
+          path: '/register',
+          name: 'register',
+          builder: (context, state) => const RegisterScreen(),
+        ),
+        GoRoute(
+          path: '/local-auth',
+          name: 'local-auth',
+          builder: (context, state) => const LocalAuthScreen(),
         ),
         GoRoute(
           path: '/scanner',

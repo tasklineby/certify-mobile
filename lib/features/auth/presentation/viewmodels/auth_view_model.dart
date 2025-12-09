@@ -1,92 +1,47 @@
-import 'package:injectable/injectable.dart';
 import 'package:certify_client/core/viewmodels/base_view_model.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:injectable/injectable.dart';
 import '../../domain/repositories/auth_repository.dart';
 
 @injectable
 class AuthViewModel extends BaseViewModel {
   final AuthRepository _repository;
+  final FlutterSecureStorage _storage;
 
-  AuthViewModel(this._repository);
-
-  String _pin = '';
-  String get pin => _pin;
-
-  bool _isSetupMode = false;
-  bool get isSetupMode => _isSetupMode;
+  AuthViewModel(this._repository, this._storage);
 
   bool _isAuthenticated = false;
   bool get isAuthenticated => _isAuthenticated;
 
-  bool _canCheckBiometrics = false;
-  bool get canCheckBiometrics => _canCheckBiometrics;
-
-  /// Defines how many digits the PIN should have.
-  static const int pinLength = 4;
-
-  Future<void> init() async {
-    runWithLoading(() async {
-      final hasPin = await _repository.isPinSet();
-      _isSetupMode = !hasPin;
-      _canCheckBiometrics = await _repository.checkBiometricsAvailable();
-    });
-  }
-
-  void addDigit(String digit) {
-    if (_pin.length < pinLength) {
-      _pin += digit;
-      notifyListeners();
-      if (_pin.length == pinLength) {
-        _submitPin();
-      }
-    }
-  }
-
-  void removeDigit() {
-    if (_pin.isNotEmpty) {
-      _pin = _pin.substring(0, _pin.length - 1);
-      setError(null); // Clear error on edit
-      notifyListeners();
-    }
-  }
-
-  void clearPin() {
-    _pin = '';
+  Future<void> checkAuth() async {
+    final token = await _storage.read(key: 'access_token');
+    _isAuthenticated = token != null;
     notifyListeners();
   }
 
-  Future<void> _submitPin() async {
-    if (_isSetupMode) {
-      // Setup new PIN
-      // In a real app, you'd ask for confirmation (enter twice)
-      await runWithLoading(() async {
-        await _repository.setPin(_pin);
-        _isSetupMode = false;
-        _isAuthenticated = true; // Auto-login after setup
-      });
-    } else {
-      // Verify PIN
-      await runWithLoading(() async {
-        final isValid = await _repository.verifyPin(_pin);
-        if (isValid) {
-          _isAuthenticated = true;
-          setError(null);
-        } else {
-          setError('Invalid PIN');
-          clearPin();
-        }
-      });
-    }
+  Future<void> login(String email, String password) async {
+    await runWithLoading(() async {
+      await _repository.login(email, password);
+      _isAuthenticated = true;
+    });
   }
 
-  Future<void> authenticateWithBiometrics() async {
-    if (!_canCheckBiometrics) return;
-
+  Future<void> register(
+    String firstName,
+    String lastName,
+    String email,
+    String password,
+  ) async {
     await runWithLoading(() async {
-      final authenticated = await _repository.authenticateWithBiometrics();
-      if (authenticated) {
-        _isAuthenticated = true;
-        setError(null);
-      }
+      await _repository.register(firstName, lastName, email, password);
+      _isAuthenticated = true;
+    });
+  }
+
+  Future<void> logout() async {
+    await runWithLoading(() async {
+      await _repository.logout();
+      _isAuthenticated = false;
     });
   }
 }

@@ -201,10 +201,10 @@ class _ScannerScreenState extends State<ScannerScreen>
                       child: Container(
                         height: 2,
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
+                          color: AppColors.primary.withValues(alpha: 0.4),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.8),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               blurRadius: 10,
                               spreadRadius: 2,
                             ),
@@ -232,10 +232,8 @@ class _ScannerScreenState extends State<ScannerScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildGlassIconButton(
-                      icon: Icons.arrow_back_rounded,
-                      onTap: () => context.go('/login'), // Or pop
-                    ),
+                    // Placeholder
+                    SizedBox(width: 40, height: 1),
                     const Text(
                       'Scan Document',
                       style: TextStyle(

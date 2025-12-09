@@ -1,7 +1,7 @@
+import 'package:certify_client/features/auth/presentation/viewmodels/auth_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:certify_client/core/theme/app_theme.dart';
-import '../viewmodels/auth_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,168 +11,183 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
   @override
-  void initState() {
-    super.initState();
-    // Initialize Auth capabilities
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AuthViewModel>().init();
-    });
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _onLogin() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final viewModel = context.read<AuthViewModel>();
+      try {
+        await viewModel.login(
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+        );
+        // Navigation is handled by router based on auth state
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString()), // In real app, parse error message
+              backgroundColor: Theme.of(context).colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<AuthViewModel>();
-
-    // Listen for auth success to navigate
-    if (viewModel.isAuthenticated) {
-      // We handle navigation in the router redirection logic mostly,
-      // but explicit navigation can also work.
-      // For GoRouter redirection, the state change triggers it.
-    }
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(),
-              Icon(
-                Icons.security,
-                size: 64,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 24),
-              Text(
-                viewModel.isSetupMode ? 'Create a PIN' : 'Enter PIN',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              if (viewModel.isLoading)
-                const CircularProgressIndicator()
-              else if (viewModel.errorMessage != null)
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Spacer(flex: 1),
                 Text(
-                  viewModel.errorMessage!,
-                  style: TextStyle(color: Theme.of(context).statusError),
-                )
-              else
-                const Text('Secure your digital documents'),
-
-              const SizedBox(height: 32),
-
-              // PIN Dots
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(AuthViewModel.pinLength, (index) {
-                  final isFilled = index < viewModel.pin.length;
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isFilled
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(
-                              context,
-                            ).colorScheme.surfaceContainerHighest,
-                      border: Border.all(
-                        color: isFilled
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.outline,
-                      ),
-                    ),
-                  );
-                }),
-              ),
-
-              const Spacer(flex: 1),
-
-              // Numpad
-              Expanded(
-                flex: 4,
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 1.5,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
+                  'Welcome Back',
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
                   ),
-                  itemCount: 12,
-                  itemBuilder: (context, index) {
-                    // Mapping index to keypad buttons:
-                    // 0-8 -> 1-9
-                    // 9 -> Biometrics or Empty
-                    // 10 -> 0
-                    // 11 -> Backspace
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Sign in to continue securely',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 48),
 
-                    if (index == 9) {
-                      if (!viewModel.isSetupMode &&
-                          viewModel.canCheckBiometrics) {
-                        return IconButton(
-                          onPressed: viewModel.authenticateWithBiometrics,
-                          icon: const Icon(Icons.fingerprint, size: 32),
-                        );
-                      }
-                      return const SizedBox();
+                // Email Field
+                TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    hintText: 'john@example.com',
+                    prefixIcon: const Icon(Icons.email_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: theme.colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.3),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
                     }
-
-                    if (index == 11) {
-                      return IconButton(
-                        onPressed: viewModel.removeDigit,
-                        icon: const Icon(Icons.backspace_outlined),
-                      );
+                    if (!value.contains('@')) {
+                      return 'Please enter a valid email';
                     }
-
-                    if (index == 10) {
-                      return _NumberButton(
-                        number: '0',
-                        onJob: viewModel.addDigit,
-                      );
-                    }
-
-                    final number = (index + 1).toString();
-                    return _NumberButton(
-                      number: number,
-                      onJob: viewModel.addDigit,
-                    );
+                    return null;
                   },
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+
+                // Password Field
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: theme.colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.3),
+                  ),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      // TODO: Implement forgot password
+                    },
+                    child: const Text('Forgot Password?'),
+                  ),
+                ),
+
+                const SizedBox(height: 32),
+
+                // Login Button
+                FilledButton(
+                  onPressed: viewModel.isLoading ? null : _onLogin,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: viewModel.isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+
+                const Spacer(flex: 2),
+
+                // Register Link
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Don't have an account?"),
+                    TextButton(
+                      onPressed: () => context.push('/register'),
+                      child: const Text('Sign Up'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _NumberButton extends StatelessWidget {
-  final String number;
-  final Function(String) onJob;
-
-  const _NumberButton({required this.number, required this.onJob});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => onJob(number),
-      customBorder: const CircleBorder(),
-      child: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Theme.of(context).colorScheme.surface,
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outlineVariant,
-          ),
-        ),
-        child: Text(number, style: Theme.of(context).textTheme.titleLarge),
       ),
     );
   }

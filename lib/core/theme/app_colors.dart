@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Brand Colors
-  static const Color primary = Color(0xFF4F46E5); // Indigo 600
-  static const Color primaryLight = Color(0xFF818CF8); // Indigo 400
-  static const Color primaryDark = Color(0xFF3730A3); // Indigo 800
+  static const Color primary = Color.fromARGB(255, 217, 65, 23); // Indigo 600
+  static const Color primaryLight = Color.fromARGB(255, 245, 98, 58); // Indigo 400
+  static const Color primaryDark = Color(0xFFf63b05); // Indigo 800
 
   // Backgrounds
   static const Color backgroundLight = Color(0xFFF9FAFB); // Gray 50
