@@ -18,6 +18,8 @@ dependencies:
   equatable: ^2.0.5
   json_annotation: ^4.8.1
   logger: ^2.0.2
+  local_auth: ^2.1.6
+  flutter_secure_storage: ^9.0.0
 
 dev_dependencies:
   flutter_test:
