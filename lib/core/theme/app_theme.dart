@@ -13,7 +13,7 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.light,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.blue, // Professional primary color
+      seedColor: Color(0xFFf63b05), // Professional primary color
       brightness: Brightness.light,
     ),
     scaffoldBackgroundColor: Colors.grey.shade50,
@@ -32,7 +32,7 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.blue,
+      seedColor: Color(0xFFf63b05),
       brightness: Brightness.dark,
     ),
     scaffoldBackgroundColor: const Color(0xFF121212),

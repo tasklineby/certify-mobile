@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Spacer(flex: 2),
+              const Spacer(),
               Icon(
                 Icons.security,
                 size: 64,
@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 }),
               ),
 
-              const Spacer(),
+              const Spacer(flex: 1),
 
               // Numpad
               Expanded(
