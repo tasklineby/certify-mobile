@@ -45,16 +45,17 @@ class _ScannerScreenState extends State<ScannerScreen>
   }
 
   void _showResultSheet(BuildContext context, VerificationResult result) {
+    final viewModel = context.read<ScannerViewModel>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      isDismissible: false,
       backgroundColor:
           Colors.transparent, // Important for custom rounded styling
       builder: (context) => VerificationResultSheet(
         result: result,
-        onScanAgain: () {
-          context.read<ScannerViewModel>().resetScanner();
-        },
+        viewModel: viewModel,
+        onScanAgain: viewModel.resetScanner,
       ),
     );
   }

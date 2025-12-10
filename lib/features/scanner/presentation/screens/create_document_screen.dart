@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:certify_client/core/theme/app_colors.dart';
 import 'package:certify_client/core/di/injection.dart';
 import 'package:certify_client/core/utils/ui_utils.dart';
@@ -63,15 +64,13 @@ class _CreateDocumentContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 20),
-
-              Text(
-                'Enter document details below.',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
               const SizedBox(height: 32),
+
+              // File Upload Section
+              _buildLabel('Attach File *', colorScheme),
+              const SizedBox(height: 12),
+              _buildFileUploadSection(context, viewModel, colorScheme),
+              const SizedBox(height: 24),
 
               // Name Field
               _buildLabel('Document Name', colorScheme),
@@ -116,19 +115,18 @@ class _CreateDocumentContent extends StatelessWidget {
                         label: Text(
                           toBeginningOfSentenceCase(type) ?? type,
                           style: TextStyle(
-                            color: isSelected
-                                ? Colors.white
-                                : colorScheme.onSurface,
+                            color: colorScheme.onSurface,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         selected: isSelected,
                         selectedColor: AppColors.primary,
                         backgroundColor: colorScheme.surfaceContainerHighest,
+                        side: BorderSide.none,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
-                          side: BorderSide.none,
                         ),
+                        checkmarkColor: colorScheme.onSurface,
                         onSelected: (_) => viewModel.setType(type),
                       ),
                     );
@@ -272,6 +270,278 @@ class _CreateDocumentContent extends StatelessWidget {
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: colorScheme.onSurface,
+      ),
+    );
+  }
+
+  Widget _buildFileUploadSection(
+    BuildContext context,
+    CreateDocumentViewModel viewModel,
+    ColorScheme colorScheme,
+  ) {
+    if (viewModel.selectedFile != null) {
+      return _buildFilePreview(context, viewModel, colorScheme);
+    }
+    return _buildFileUploadEmpty(context, viewModel, colorScheme);
+  }
+
+  Widget _buildFileUploadEmpty(
+    BuildContext context,
+    CreateDocumentViewModel viewModel,
+    ColorScheme colorScheme,
+  ) {
+    return GestureDetector(
+      onTap: () => _showFileSourceSheet(context, viewModel),
+      child: Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: colorScheme.outline.withValues(alpha: 0.3),
+            width: 2,
+            strokeAlign: BorderSide.strokeAlignCenter,
+            style: BorderStyle.solid,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              Icons.cloud_upload_outlined,
+              size: 48,
+              color: colorScheme.primary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Tap to attach file or take photo',
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Supported: JPG, PNG, PDF',
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilePreview(
+    BuildContext context,
+    CreateDocumentViewModel viewModel,
+    ColorScheme colorScheme,
+  ) {
+    final file = viewModel.selectedFile!;
+    final fileName = file.path.split('/').last;
+    final isImage =
+        fileName.toLowerCase().endsWith('.jpg') ||
+        fileName.toLowerCase().endsWith('.jpeg') ||
+        fileName.toLowerCase().endsWith('.png');
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.3),
+          width: 2,
+        ),
+      ),
+      child: Row(
+        children: [
+          if (isImage)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.file(file, width: 60, height: 60, fit: BoxFit.cover),
+            )
+          else
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.picture_as_pdf,
+                color: AppColors.primary,
+                size: 32,
+              ),
+            ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  fileName,
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${(file.lengthSync() / 1024).toStringAsFixed(1)} KB',
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: viewModel.removeFile,
+            icon: Icon(Icons.close, color: colorScheme.error),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFileSourceSheet(
+    BuildContext context,
+    CreateDocumentViewModel viewModel,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 4,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Select File Source',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            _buildSourceOption(
+              context,
+              icon: Icons.camera_alt_outlined,
+              title: 'Camera',
+              subtitle: 'Take a photo',
+              onTap: () {
+                Navigator.pop(context);
+                viewModel.pickImageFromCamera();
+              },
+            ),
+            const SizedBox(height: 12),
+            _buildSourceOption(
+              context,
+              icon: Icons.photo_library_outlined,
+              title: 'Gallery',
+              subtitle: 'Choose from photos',
+              onTap: () {
+                Navigator.pop(context);
+                viewModel.pickImageFromGallery();
+              },
+            ),
+            const SizedBox(height: 12),
+            _buildSourceOption(
+              context,
+              icon: Icons.insert_drive_file_outlined,
+              title: 'Files',
+              subtitle: 'Browse documents',
+              onTap: () {
+                Navigator.pop(context);
+                viewModel.pickDocument();
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSourceOption(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: AppColors.primary, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
       ),
     );
   }

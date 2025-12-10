@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 
 import '../../../../core/viewmodels/base_view_model.dart';
 import '../../data/models/create_document_request.dart';
@@ -8,6 +11,7 @@ import '../../domain/repositories/scanner_repository.dart';
 @injectable
 class CreateDocumentViewModel extends BaseViewModel {
   final ScannerRepository _repository;
+  final ImagePicker _imagePicker = ImagePicker();
 
   CreateDocumentViewModel(this._repository);
 
@@ -23,6 +27,10 @@ class CreateDocumentViewModel extends BaseViewModel {
   DateTime? _selectedDate;
   DateTime? get selectedDate => _selectedDate;
 
+  // File selection
+  File? _selectedFile;
+  File? get selectedFile => _selectedFile;
+
   void setType(String type) {
     _selectedType = type;
     notifyListeners();
@@ -30,6 +38,56 @@ class CreateDocumentViewModel extends BaseViewModel {
 
   void setDate(DateTime date) {
     _selectedDate = date;
+    notifyListeners();
+  }
+
+  Future<void> pickImageFromCamera() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+      );
+      if (image != null) {
+        _selectedFile = File(image.path);
+        notifyListeners();
+      }
+    } catch (e) {
+      setError('Failed to capture image: $e');
+    }
+  }
+
+  Future<void> pickImageFromGallery() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+      if (image != null) {
+        _selectedFile = File(image.path);
+        notifyListeners();
+      }
+    } catch (e) {
+      setError('Failed to pick image: $e');
+    }
+  }
+
+  Future<void> pickDocument() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+      );
+      if (result != null && result.files.single.path != null) {
+        _selectedFile = File(result.files.single.path!);
+        notifyListeners();
+      }
+    } catch (e) {
+      setError('Failed to pick file: $e');
+    }
+  }
+
+  void removeFile() {
+    _selectedFile = null;
     notifyListeners();
   }
 
@@ -53,9 +111,13 @@ class CreateDocumentViewModel extends BaseViewModel {
       setError('Please select an expiration date');
       return false;
     }
+    if (_selectedFile == null) {
+      setError('Please attach a file');
+      return false;
+    }
 
     setLoading(true);
-    setError(null); // Clear previous errors
+    setError(null);
 
     try {
       final request = CreateDocumentRequest(
@@ -65,7 +127,7 @@ class CreateDocumentViewModel extends BaseViewModel {
         expirationDate: _selectedDate!.toUtc().toIso8601String(),
       );
 
-      await _repository.createDocument(request);
+      await _repository.createDocument(request, _selectedFile!);
       setLoading(false);
       return true;
     } catch (e) {

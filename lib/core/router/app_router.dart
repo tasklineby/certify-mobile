@@ -11,6 +11,7 @@ import 'package:certify_client/features/history/presentation/screens/history_det
 import 'package:certify_client/core/domain/entities/verification_result.dart';
 import 'package:certify_client/features/scanner/presentation/screens/create_document_screen.dart';
 import 'package:certify_client/features/scanner/presentation/screens/documents_list_screen.dart';
+import 'package:certify_client/features/scanner/presentation/screens/pdf_viewer_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:certify_client/core/di/injection.dart';
 import 'package:certify_client/features/scanner/presentation/viewmodels/documents_list_view_model.dart';
@@ -118,6 +119,17 @@ class AppRouter {
             create: (_) => getIt<DocumentsListViewModel>(),
             child: const DocumentsListScreen(),
           ),
+        ),
+        GoRoute(
+          path: '/document-viewer',
+          name: 'document-viewer',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return PdfViewerScreen(
+              filePath: extra['filePath'] as String,
+              documentName: extra['title'] as String,
+            );
+          },
         ),
       ],
     );
