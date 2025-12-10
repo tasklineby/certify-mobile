@@ -16,11 +16,13 @@ DocumentModel _$DocumentModelFromJson(Map<String, dynamic> json) =>
     );
 
 DocumentData _$DocumentDataFromJson(Map<String, dynamic> json) => DocumentData(
-  id: (json['id'] as num).toInt(),
-  companyId: (json['company_id'] as num).toInt(),
-  name: json['name'] as String,
-  type: json['type'] as String,
-  summary: json['summary'] as String,
-  scanCount: (json['scan_count'] as num).toInt(),
-  expirationDate: DateTime.parse(json['expiration_date'] as String),
+  id: (json['id'] as num?)?.toInt(),
+  companyId: (json['company_id'] as num?)?.toInt(),
+  name: json['name'] as String?,
+  type: json['type'] as String?,
+  summary: json['summary'] as String?,
+  scanCount: (json['scan_count'] as num?)?.toInt(),
+  expirationDate: json['expiration_date'] == null
+      ? null
+      : DateTime.parse(json['expiration_date'] as String),
 );

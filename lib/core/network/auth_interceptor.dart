@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
@@ -20,8 +21,10 @@ class AuthInterceptor extends QueuedInterceptorsWrapper {
     RequestInterceptorHandler handler,
   ) async {
     final token = await _storage.read(key: 'access_token');
+    debugPrint('---- Access token: $token');
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
+      debugPrint('---- Added access token to headers');
     }
     super.onRequest(options, handler);
   }
@@ -33,18 +36,14 @@ class AuthInterceptor extends QueuedInterceptorsWrapper {
   ) async {
     if (err.response?.statusCode == 401) {
       final refreshToken = await _storage.read(key: 'refresh_token');
-
+      debugPrint('---- Refresh token: $refreshToken');
+      // If refresh token is missing, strictly treat as session expired
       if (refreshToken == null) {
-        await _clearTokens();
+        await _performLogout();
         return super.onError(err, handler);
       }
 
       if (_isRefreshing) {
-        // If already refreshing, you might want to queue this request or just fail.
-        // For simplicity, we fail non-refresh requests if a refresh is already in progress
-        // unless we implement a proper queue.
-        // Given internal QueuedInterceptorsWrapper, we are already sequential for THIS Dio instance.
-        // However, we are using a SEPARATE Dio instance for refresh.
         return handler.reject(err);
       }
 
@@ -80,11 +79,11 @@ class AuthInterceptor extends QueuedInterceptorsWrapper {
           return handler.resolve(clonedRequest);
         } else {
           // Refresh failed
-          await _clearTokens();
+          await _performLogout();
           return super.onError(err, handler);
         }
       } catch (e) {
-        await _clearTokens();
+        await _performLogout();
         return super.onError(err, handler);
       } finally {
         _isRefreshing = false;
@@ -94,8 +93,14 @@ class AuthInterceptor extends QueuedInterceptorsWrapper {
     super.onError(err, handler);
   }
 
-  Future<void> _clearTokens() async {
-    await _storage.deleteAll();
-    // Dispatch global event if needed, e.g. via a StreamController injected
+  Future<void> _performLogout() async {
+    try {
+      await _storage.deleteAll();
+    } catch (e) {
+      // If Keychain is corrupted, deleteAll might fail.
+      // We catch it so the app can still proceed to "logged out" state logically
+      // (e.g. by not finding tokens next time or navigation happening anyway).
+      print('Error clearing storage: $e');
+    }
   }
 }

@@ -35,6 +35,8 @@ import '../../features/scanner/data/repositories/scanner_repository_impl.dart'
     as _i419;
 import '../../features/scanner/domain/repositories/scanner_repository.dart'
     as _i816;
+import '../../features/scanner/presentation/viewmodels/create_document_view_model.dart'
+    as _i137;
 import '../../features/scanner/presentation/viewmodels/scanner_view_model.dart'
     as _i52;
 import '../network/auth_interceptor.dart' as _i908;
@@ -95,6 +97,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i816.ScannerRepository>(
       () => _i419.ScannerRepositoryImpl(gh<_i667.DioClient>()),
+    );
+    gh.factory<_i137.CreateDocumentViewModel>(
+      () => _i137.CreateDocumentViewModel(gh<_i816.ScannerRepository>()),
     );
     gh.factory<_i52.ScannerViewModel>(
       () => _i52.ScannerViewModel(gh<_i816.ScannerRepository>()),

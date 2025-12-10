@@ -7,6 +7,7 @@ import 'package:certify_client/features/local_auth/presentation/viewmodels/local
 import 'package:certify_client/features/local_auth/presentation/screens/local_auth_screen.dart';
 import 'package:certify_client/features/scanner/presentation/screens/scanner_screen.dart';
 import 'package:certify_client/features/history/presentation/screens/history_screen.dart';
+import 'package:certify_client/features/scanner/presentation/screens/create_document_screen.dart';
 import 'placeholders.dart'
     hide
         LoginScreen,
@@ -86,6 +87,11 @@ class AppRouter {
           path: '/history',
           name: 'history',
           builder: (context, state) => const HistoryScreen(),
+        ),
+        GoRoute(
+          path: '/create-document',
+          name: 'create-document',
+          builder: (context, state) => const CreateDocumentScreen(),
         ),
       ],
     );

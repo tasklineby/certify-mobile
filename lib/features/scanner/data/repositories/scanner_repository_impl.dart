@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:certify_client/core/domain/entities/verification_result.dart';
 import 'package:certify_client/features/scanner/data/models/document_model.dart';
+import 'package:certify_client/features/scanner/data/models/create_document_request.dart';
 import 'package:certify_client/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 import '../../domain/repositories/scanner_repository.dart';
@@ -31,6 +33,20 @@ class ScannerRepositoryImpl implements ScannerRepository {
         );
       }
       throw Exception('Failed to verify document: ${e.message}');
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<String> createDocument(CreateDocumentRequest request) async {
+    try {
+      final data = request.toJson();
+      debugPrint('---- Create document data: $data');
+      final response = await _dioClient.dio.post('/documents', data: data);
+      return response.data['hash'];
+    } on DioException catch (e) {
+      throw Exception('Failed to create document: ${e.message}');
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
     }
