@@ -7,7 +7,13 @@ import 'package:certify_client/features/local_auth/presentation/viewmodels/local
 import 'package:certify_client/features/local_auth/presentation/screens/local_auth_screen.dart';
 import 'package:certify_client/features/scanner/presentation/screens/scanner_screen.dart';
 import 'package:certify_client/features/history/presentation/screens/history_screen.dart';
+import 'package:certify_client/features/history/presentation/screens/history_details_screen.dart';
+import 'package:certify_client/core/domain/entities/verification_result.dart';
 import 'package:certify_client/features/scanner/presentation/screens/create_document_screen.dart';
+import 'package:certify_client/features/scanner/presentation/screens/documents_list_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:certify_client/core/di/injection.dart';
+import 'package:certify_client/features/scanner/presentation/viewmodels/documents_list_view_model.dart';
 import 'placeholders.dart'
     hide
         LoginScreen,
@@ -87,11 +93,31 @@ class AppRouter {
           path: '/history',
           name: 'history',
           builder: (context, state) => const HistoryScreen(),
+          routes: [
+            GoRoute(
+              path: 'details',
+              name: 'history_details',
+              builder: (context, state) {
+                // Safely cast extra to VerificationResult
+                // In a real app we might handle nulls or pass IDs
+                final result = state.extra as VerificationResult;
+                return HistoryDetailsScreen(result: result);
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/create-document',
           name: 'create-document',
           builder: (context, state) => const CreateDocumentScreen(),
+        ),
+        GoRoute(
+          path: '/documents',
+          name: 'documents',
+          builder: (context, state) => ChangeNotifierProvider(
+            create: (_) => getIt<DocumentsListViewModel>(),
+            child: const DocumentsListScreen(),
+          ),
         ),
       ],
     );

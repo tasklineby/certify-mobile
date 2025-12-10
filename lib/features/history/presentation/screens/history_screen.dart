@@ -91,7 +91,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               offset: Offset(0, 50 * (1 - value)),
                               child: Opacity(
                                 opacity: value,
-                                child: HistoryCard(result: result),
+                                child: GestureDetector(
+                                  onTap: () => context.push(
+                                    '/history/details',
+                                    extra: result,
+                                  ),
+                                  child: HistoryCard(result: result),
+                                ),
                               ),
                             );
                           },

@@ -1,4 +1,5 @@
 import 'package:certify_client/core/domain/entities/verification_result.dart';
+import 'package:certify_client/features/scanner/domain/entities/document.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_model.g.dart';
@@ -60,6 +61,7 @@ class DocumentData {
   final String? summary;
   final int? scanCount;
   final DateTime? expirationDate;
+  final String? fileName;
 
   const DocumentData({
     this.id,
@@ -69,8 +71,22 @@ class DocumentData {
     this.summary,
     this.scanCount,
     this.expirationDate,
+    this.fileName,
   });
 
   factory DocumentData.fromJson(Map<String, dynamic> json) =>
       _$DocumentDataFromJson(json);
+
+  Document toEntity() {
+    return Document(
+      id: id ?? 0,
+      companyId: companyId ?? 0,
+      name: name ?? '',
+      type: type ?? '',
+      summary: summary ?? '',
+      scanCount: scanCount,
+      expirationDate: expirationDate,
+      fileName: fileName,
+    );
+  }
 }

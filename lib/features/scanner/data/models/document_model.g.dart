@@ -25,4 +25,5 @@ DocumentData _$DocumentDataFromJson(Map<String, dynamic> json) => DocumentData(
   expirationDate: json['expiration_date'] == null
       ? null
       : DateTime.parse(json['expiration_date'] as String),
+  fileName: json['file_name'] as String?,
 );

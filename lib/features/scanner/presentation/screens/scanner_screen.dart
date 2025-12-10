@@ -262,8 +262,10 @@ class _ScannerScreenState extends State<ScannerScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Placeholder
-                    SizedBox(width: 40, height: 1),
+                    _buildGlassIconButton(
+                      icon: Icons.folder_copy_outlined,
+                      onTap: () => context.push('/documents'),
+                    ),
                     const Text(
                       'Scan Document',
                       style: TextStyle(
@@ -377,7 +379,6 @@ class _ScannerScreenState extends State<ScannerScreen>
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/create-document'),
         backgroundColor: AppColors.primary,
-        shape: const CircleBorder(),
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );

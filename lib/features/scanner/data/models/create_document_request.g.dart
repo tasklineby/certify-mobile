@@ -18,8 +18,8 @@ CreateDocumentRequest _$CreateDocumentRequestFromJson(
 Map<String, dynamic> _$CreateDocumentRequestToJson(
   CreateDocumentRequest instance,
 ) => <String, dynamic>{
+  'expiration_date': instance.expirationDate,
   'name': instance.name,
   'summary': instance.summary,
   'type': instance.type,
-  'expiration_date': instance.expirationDate,
 };

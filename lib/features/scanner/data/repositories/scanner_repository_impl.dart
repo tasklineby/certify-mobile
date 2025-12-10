@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:certify_client/core/domain/entities/verification_result.dart';
 import 'package:certify_client/features/scanner/data/models/document_model.dart';
+import 'package:certify_client/features/scanner/domain/entities/document.dart';
 import 'package:certify_client/features/scanner/data/models/create_document_request.dart';
 import 'package:certify_client/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
@@ -47,6 +48,19 @@ class ScannerRepositoryImpl implements ScannerRepository {
       return response.data['hash'];
     } on DioException catch (e) {
       throw Exception('Failed to create document: ${e.message}');
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<List<Document>> getCompanyDocuments() async {
+    try {
+      final response = await _dioClient.dio.get('/documents');
+      final List<dynamic> list = response.data;
+      return list.map((e) => DocumentData.fromJson(e).toEntity()).toList();
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch documents: ${e.message}');
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
     }
