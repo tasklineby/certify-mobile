@@ -1,5 +1,6 @@
 import 'package:certify_client/core/theme/app_colors.dart';
 import 'package:certify_client/core/di/injection.dart';
+import 'package:certify_client/core/utils/ui_utils.dart';
 import 'package:certify_client/features/scanner/presentation/viewmodels/create_document_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -17,7 +18,6 @@ class _CreateDocumentScreenState extends State<CreateDocumentScreen> {
   // We'll provide the ViewModel manually here or in the router.
   // Ideally, if using get_it, we can instantiate it here if not provided by router.
   // But standard pattern is Provider in the widget tree.
-  // I will assume it's provided, or I will wrap it here for simplicity given the context.
   // The user asked to register in DI, so I will use getIt to create it.
 
   @override
@@ -36,119 +36,110 @@ class _CreateDocumentContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<CreateDocumentViewModel>();
     final theme = Theme.of(context);
-
-    // Listen for errors or success if needed (usually via listener/stream, but simple state check works for now)
-    // For success navigation, usually ViewModel triggers a callback or we listen to a stream.
-    // Given the simple boolean return in submit(), let's handle it in the button callback actually.
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('New Document'),
+        title: Text(
+          'New Document',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSurface,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: theme.textTheme.headlineMedium?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
+        titleSpacing: 24, // Matches padding requirement
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: Icon(Icons.arrow_back_ios_new, color: colorScheme.onSurface),
           onPressed: () => context.pop(),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const SizedBox(height: 20),
+
               Text(
                 'Enter document details below.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondaryLight,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 32),
 
               // Name Field
-              _buildLabel('Document Name'),
-              const SizedBox(height: 8),
+              _buildLabel('Document Name', colorScheme),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: viewModel.nameController,
-                decoration: _buildInputDecoration('e.g. Service Agreement'),
+                decoration: _buildInputDecoration(
+                  context,
+                  'e.g. Service Agreement',
+                  colorScheme,
+                ),
+                style: TextStyle(color: colorScheme.onSurface),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Summary Field
-              _buildLabel('Summary'),
-              const SizedBox(height: 8),
+              _buildLabel('Summary', colorScheme),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: viewModel.summaryController,
                 maxLines: 3,
-                decoration: _buildInputDecoration('Brief description...'),
+                decoration: _buildInputDecoration(
+                  context,
+                  'Brief description...',
+                  colorScheme,
+                ),
+                style: TextStyle(color: colorScheme.onSurface),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Type Selector
-              _buildLabel('Document Type'),
+              _buildLabel('Document Type', colorScheme),
               const SizedBox(height: 12),
-              SizedBox(
-                height: 48,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: viewModel.documentTypes.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (context, index) {
-                    final type = viewModel.documentTypes[index];
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: viewModel.documentTypes.map((type) {
                     final isSelected = viewModel.selectedType == type;
-                    return GestureDetector(
-                      onTap: () => viewModel.setType(type),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primary
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: ChoiceChip(
+                        label: Text(
+                          toBeginningOfSentenceCase(type) ?? type,
+                          style: TextStyle(
                             color: isSelected
-                                ? AppColors.primary
-                                : Theme.of(context).colorScheme.surface,
-                          ),
-                          boxShadow: isSelected
-                              ? [
-                                  BoxShadow(
-                                    color: AppColors.primary.withOpacity(0.3),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ]
-                              : [],
-                        ),
-                        child: Center(
-                          child: Text(
-                            toBeginningOfSentenceCase(type) ?? type,
-                            style: TextStyle(
-                              color: isSelected
-                                  ? Colors.white
-                                  : AppColors.textSecondaryLight,
-                              fontWeight: FontWeight.w600,
-                            ),
+                                ? Colors.white
+                                : colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
+                        selected: isSelected,
+                        selectedColor: AppColors.primary,
+                        backgroundColor: colorScheme.surfaceContainerHighest,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide.none,
+                        ),
+                        onSelected: (_) => viewModel.setType(type),
                       ),
                     );
-                  },
+                  }).toList(),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Expiration Date
-              _buildLabel('Expiration Date'),
-              const SizedBox(height: 8),
+              _buildLabel('Expiration Date', colorScheme),
+              const SizedBox(height: 12),
               TextFormField(
                 readOnly: true,
                 onTap: () async {
@@ -160,7 +151,7 @@ class _CreateDocumentContent extends StatelessWidget {
                     builder: (context, child) {
                       return Theme(
                         data: theme.copyWith(
-                          colorScheme: theme.colorScheme.copyWith(
+                          colorScheme: colorScheme.copyWith(
                             primary: AppColors.primary,
                             onPrimary: Colors.white,
                           ),
@@ -173,18 +164,29 @@ class _CreateDocumentContent extends StatelessWidget {
                     viewModel.setDate(picked);
                   }
                 },
-                decoration: _buildInputDecoration('Select Date').copyWith(
-                  suffixIcon: const Icon(
-                    Icons.calendar_today_rounded,
-                    color: AppColors.textSecondaryLight,
-                  ),
-                  hintText: viewModel.selectedDate != null
-                      ? DateFormat.yMMMd().format(viewModel.selectedDate!)
-                      : 'Select Date',
-                ),
+                decoration:
+                    _buildInputDecoration(
+                      context,
+                      'Select Date',
+                      colorScheme,
+                    ).copyWith(
+                      suffixIcon: Icon(
+                        Icons.calendar_today_rounded,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      hintText: viewModel.selectedDate != null
+                          ? DateFormat.yMMMd().format(viewModel.selectedDate!)
+                          : 'Select Date',
+                      hintStyle: TextStyle(
+                        color: viewModel.selectedDate != null
+                            ? colorScheme.onSurface
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                style: TextStyle(color: colorScheme.onSurface),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               if (viewModel.errorMessage != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
@@ -194,75 +196,96 @@ class _CreateDocumentContent extends StatelessWidget {
                   ),
                 ),
 
+              const SizedBox(height: 32),
+
+              // Custom Submit Button
+              GestureDetector(
+                onTap: viewModel.isLoading
+                    ? null
+                    : () async {
+                        final success = await viewModel.submit();
+                        if (success && context.mounted) {
+                          context.pop();
+                          UiUtils.showCustomSnackBar(
+                            context,
+                            'Document created successfully',
+                          );
+                        }
+                      },
+                child: Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: viewModel.isLoading
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Create Document',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
             ],
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: FloatingActionButton.extended(
-            onPressed: viewModel.isLoading
-                ? null
-                : () async {
-                    final success = await viewModel.submit();
-                    if (success && context.mounted) {
-                      context.pop(); // Go back on success
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Document created successfully'),
-                          backgroundColor: AppColors.success,
-                        ),
-                      );
-                    }
-                  },
-            backgroundColor: AppColors.primary,
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            label: viewModel.isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : const Text(
-                    'Create Document',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-          ),
-        ),
-      ),
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, ColorScheme colorScheme) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimaryLight,
+        color: colorScheme.onSurface,
       ),
     );
   }
 
-  InputDecoration _buildInputDecoration(String hint) {
+  InputDecoration _buildInputDecoration(
+    BuildContext context,
+    String hint,
+    ColorScheme colorScheme,
+  ) {
     return InputDecoration(
       hintText: hint,
+      hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
       filled: true,
+      fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
