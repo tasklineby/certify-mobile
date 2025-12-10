@@ -28,21 +28,15 @@ class _DocumentsListScreenState extends State<DocumentsListScreen> {
     final viewModel = context.watch<DocumentsListViewModel>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           'Company Documents',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => context.pop(),
         ),
       ),
@@ -79,7 +73,6 @@ class _DocumentsListScreenState extends State<DocumentsListScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -124,10 +117,7 @@ class _DocumentsListScreenState extends State<DocumentsListScreen> {
                     const SizedBox(width: 4),
                     Text(
                       '${doc.scanCount}',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -136,32 +126,24 @@ class _DocumentsListScreenState extends State<DocumentsListScreen> {
           const SizedBox(height: 12),
           Text(
             doc.name,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             doc.summary,
-            maxLines: 2,
+            maxLines: 4,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.grey[600], height: 1.4),
+            style: const TextStyle(height: 1.4),
           ),
           const SizedBox(height: 16),
           if (doc.expirationDate != null)
             Row(
               children: [
-                Icon(
-                  Icons.calendar_today_outlined,
-                  size: 14,
-                  color: Colors.grey[500],
-                ),
+                const Icon(Icons.calendar_today_outlined, size: 14),
                 const SizedBox(width: 6),
                 Text(
                   'Expires: ${DateFormat('MMM d, yyyy').format(doc.expirationDate!)}',
-                  style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
