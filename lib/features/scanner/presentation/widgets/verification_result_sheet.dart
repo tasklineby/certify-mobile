@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:certify_client/core/domain/entities/verification_result.dart';
 import 'package:certify_client/core/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
-import 'package:certify_client/features/scanner/presentation/widgets/comparison_result_sheet.dart';
 import 'package:certify_client/features/scanner/presentation/viewmodels/scanner_view_model.dart';
 
 class VerificationResultSheet extends StatefulWidget {
@@ -259,30 +258,41 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
                 width: double.infinity,
                 height: 56,
                 child: OutlinedButton(
-                  onPressed: () => _showCompareOptions(context),
+                  onPressed: widget.viewModel.isComparing
+                      ? null
+                      : () => _showCompareOptions(context),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.primary, width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.compare_arrows,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Compare with Physical Copy',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
+                  child: widget.viewModel.isComparing
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.compare_arrows,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Compare with Physical Copy',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ),
@@ -322,7 +332,7 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
+      builder: (modalContext) => Container(
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -350,69 +360,27 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
             ),
             const SizedBox(height: 24),
             _buildCompareOption(
-              context,
+              modalContext,
               icon: Icons.camera_alt_outlined,
               title: 'Take Photos',
               subtitle: 'Capture physical document',
               onTap: () async {
-                Navigator.pop(context);
-
-                // Capture photo
+                Navigator.of(modalContext).pop();
                 await widget.viewModel.capturePhoto();
-
-                // If at least one photo, compare
                 if (widget.viewModel.capturedPhotos.isNotEmpty) {
                   await widget.viewModel.compareWithPhotos();
-
-                  // Show result if available
-                  if (widget.viewModel.comparisonResult != null &&
-                      context.mounted) {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) => ComparisonResultSheet(
-                        result: widget.viewModel.comparisonResult!,
-                        onClose: () {
-                          Navigator.pop(context);
-                          context.pop(); // Close main sheet
-                          widget.onScanAgain();
-                        },
-                      ),
-                    );
-                  }
                 }
               },
             ),
             const SizedBox(height: 12),
             _buildCompareOption(
-              context,
+              modalContext,
               icon: Icons.picture_as_pdf_outlined,
               title: 'Upload PDF',
               subtitle: 'Choose PDF from files',
               onTap: () async {
-                Navigator.pop(context);
-
-                // Call PDF comparison
+                Navigator.of(modalContext).pop();
                 await widget.viewModel.compareWithPdf();
-
-                // Show result if available
-                if (widget.viewModel.comparisonResult != null &&
-                    context.mounted) {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => ComparisonResultSheet(
-                      result: widget.viewModel.comparisonResult!,
-                      onClose: () {
-                        Navigator.pop(context);
-                        context.pop(); // Close main sheet
-                        widget.onScanAgain();
-                      },
-                    ),
-                  );
-                }
               },
             ),
           ],

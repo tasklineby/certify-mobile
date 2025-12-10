@@ -145,6 +145,8 @@ class ScannerRepositoryImpl implements ScannerRepository {
   @override
   Future<ComparisonResponse> compareWithPdf(String hash, File pdf) async {
     try {
+      await Future.delayed(const Duration(seconds: 1));
+
       final formData = FormData.fromMap({
         'hash': hash,
         'file': await MultipartFile.fromFile(

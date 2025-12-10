@@ -85,6 +85,11 @@ class ScannerViewModel extends BaseViewModel {
     controller.start();
   }
 
+  void clearComparisonResult() {
+    _comparisonResult = null;
+    notifyListeners();
+  }
+
   // Photo management for comparison
   Future<void> capturePhoto() async {
     try {

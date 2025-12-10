@@ -2,6 +2,8 @@ import 'package:certify_client/core/theme/app_colors.dart';
 import 'package:certify_client/core/domain/entities/verification_result.dart';
 import 'package:certify_client/features/scanner/presentation/viewmodels/scanner_view_model.dart';
 import 'package:certify_client/features/scanner/presentation/widgets/verification_result_sheet.dart';
+import 'package:certify_client/features/scanner/presentation/widgets/comparison_result_sheet.dart';
+import 'package:certify_client/features/scanner/data/models/comparison_response_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +58,22 @@ class _ScannerScreenState extends State<ScannerScreen>
         result: result,
         viewModel: viewModel,
         onScanAgain: viewModel.resetScanner,
+      ),
+    );
+  }
+
+  void _showComparisonResult(BuildContext context, ComparisonResponse result) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ComparisonResultSheet(
+        result: result,
+        onClose: () {
+          Navigator.pop(context);
+          context.read<ScannerViewModel>().resetScanner();
+        },
       ),
     );
   }
@@ -149,6 +167,14 @@ class _ScannerScreenState extends State<ScannerScreen>
         if (ModalRoute.of(context)?.isCurrent == true) {
           // Check if sheet is not already open
           _showResultSheet(context, viewModel.result!);
+        }
+      });
+    } else if (viewModel.comparisonResult != null && !viewModel.isComparing) {
+      // Using addPostFrameCallback to avoid build-phase navigation
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (ModalRoute.of(context)?.isCurrent == true) {
+          // Check if sheet is not already open
+          _showComparisonResult(context, viewModel.comparisonResult!);
         }
       });
     }
