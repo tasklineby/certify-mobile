@@ -83,13 +83,13 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
   String _getStatusTitle() {
     switch (widget.result.status) {
       case VerificationStatus.valid:
-        return 'Authentic Document';
+        return 'Подлинный документ';
       case VerificationStatus.warning:
-        return 'Verification Warning';
+        return 'Предупреждение';
       case VerificationStatus.invalid:
-        return 'Invalid Document';
+        return 'Недействительный документ';
       case VerificationStatus.unknown:
-        return 'Unknown Status';
+        return 'Неизвестный статус';
     }
   }
 
@@ -156,7 +156,7 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
                   children: [
                     // Verification Message
                     Text(
-                      'Verification Message',
+                      'Сообщение верификации',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -200,7 +200,7 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
                       Divider(color: Colors.grey.shade300),
                       const SizedBox(height: 16),
                       Text(
-                        'Document Metadata',
+                        'Метаданные документа',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -285,7 +285,7 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
                             ),
                             const SizedBox(width: 8),
                             const Text(
-                              'Compare with Physical Copy',
+                              'Сравнить с физической копией',
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
@@ -317,7 +317,7 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
                     ),
                     elevation: 0,
                   ),
-                  child: const Text('Scan Next Document'),
+                  child: const Text('Отсканировать ещё'),
                 ),
               ),
             ),
@@ -351,7 +351,7 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
             ),
             const SizedBox(height: 24),
             const Text(
-              'Choose Comparison Method',
+              'Выберите метод сравнения',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -362,8 +362,8 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
             _buildCompareOption(
               modalContext,
               icon: Icons.camera_alt_outlined,
-              title: 'Take Photos',
-              subtitle: 'Capture physical document',
+              title: 'Сделать фото',
+              subtitle: 'Сфотографировать физический документ',
               onTap: () async {
                 Navigator.of(modalContext).pop();
                 await widget.viewModel.capturePhoto();
@@ -376,8 +376,8 @@ class _VerificationResultSheetState extends State<VerificationResultSheet>
             _buildCompareOption(
               modalContext,
               icon: Icons.picture_as_pdf_outlined,
-              title: 'Upload PDF',
-              subtitle: 'Choose PDF from files',
+              title: 'Загрузить PDF',
+              subtitle: 'Выбрать PDF из файлов',
               onTap: () async {
                 Navigator.of(modalContext).pop();
                 await widget.viewModel.compareWithPdf();

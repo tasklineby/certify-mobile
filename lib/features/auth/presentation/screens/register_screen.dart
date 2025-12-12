@@ -79,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Create Account',
+                    'Создать аккаунт',
                     style: theme.textTheme.displaySmall?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.onSurface,
@@ -87,7 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Join us to secure your future',
+                    'Присоединяйтесь к нам для защиты вашего будущего',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -98,8 +98,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _firstNameController,
                     decoration: InputDecoration(
-                      labelText: 'First Name',
-                      hintText: 'John',
+                      labelText: 'Имя',
+                      hintText: 'Иван',
                       prefixIcon: const Icon(Icons.person_outline),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -111,7 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your first name';
+                        return 'Введите имя';
                       }
                       return null;
                     },
@@ -122,8 +122,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _lastNameController,
                     decoration: InputDecoration(
-                      labelText: 'Last Name',
-                      hintText: 'Doe',
+                      labelText: 'Фамилия',
+                      hintText: 'Иванов',
                       prefixIcon: const Icon(Icons.person_outline),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -135,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your last name';
+                        return 'Введите фамилию';
                       }
                       return null;
                     },
@@ -147,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _emailController,
                     decoration: InputDecoration(
                       labelText: 'Email',
-                      hintText: 'john@example.com',
+                      hintText: 'ivan@example.com',
                       prefixIcon: const Icon(Icons.email_outlined),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -160,10 +160,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
+                        return 'Введите email';
                       }
                       if (!value.contains('@')) {
-                        return 'Please enter a valid email';
+                        return 'Введите корректный email';
                       }
                       return null;
                     },
@@ -174,7 +174,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: 'Пароль',
                       prefixIcon: const Icon(Icons.lock_outline),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -187,10 +187,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return 'Введите пароль';
                       }
                       if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
+                        return 'Пароль должен быть минимум 6 символов';
                       }
                       return null;
                     },
@@ -217,7 +217,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           )
                         : const Text(
-                            'Sign Up',
+                            'Зарегистрироваться',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

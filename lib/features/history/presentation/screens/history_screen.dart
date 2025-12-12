@@ -54,7 +54,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                   const SizedBox(width: 16),
                   Text(
-                    'History',
+                    'История',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -72,7 +72,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   : viewModel.history.isEmpty
                   ? Center(
                       child: Text(
-                        'No history yet',
+                        'История пуста',
                         style: TextStyle(color: AppColors.textSecondaryLight),
                       ),
                     )

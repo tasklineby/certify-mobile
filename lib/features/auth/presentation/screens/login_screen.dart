@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         const SizedBox(height: 48),
                         Text(
-                          'Welcome Back',
+                          'Добро пожаловать',
                           style: theme.textTheme.displaySmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.onSurface,
@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Sign in to continue securely',
+                          'Войдите, чтобы продолжить безопасно',
                           style: theme.textTheme.bodyLarge?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _emailController,
                           decoration: InputDecoration(
                             labelText: 'Email',
-                            hintText: 'john@example.com',
+                            hintText: 'ivan@example.com',
                             prefixIcon: const Icon(Icons.email_outlined),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -108,10 +108,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
+                              return 'Введите email';
                             }
                             if (!value.contains('@')) {
-                              return 'Please enter a valid email';
+                              return 'Введите корректный email';
                             }
                             return null;
                           },
@@ -122,7 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextFormField(
                           controller: _passwordController,
                           decoration: InputDecoration(
-                            labelText: 'Password',
+                            labelText: 'Пароль',
                             prefixIcon: const Icon(Icons.lock_outline),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
+                              return 'Введите пароль';
                             }
                             return null;
                           },
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () {
                               // TODO: Implement forgot password
                             },
-                            child: const Text('Forgot Password?'),
+                            child: const Text('Забыли пароль?'),
                           ),
                         ),
 
@@ -173,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 )
                               : const Text(
-                                  'Login',
+                                  'Войти',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -187,10 +187,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Don't have an account?"),
+                            const Text("Нет аккаунта?"),
                             TextButton(
                               onPressed: () => context.push('/register'),
-                              child: const Text('Sign Up'),
+                              child: const Text('Зарегистрироваться'),
                             ),
                           ],
                         ),

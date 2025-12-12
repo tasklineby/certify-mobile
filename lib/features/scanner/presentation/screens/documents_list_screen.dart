@@ -30,7 +30,7 @@ class _DocumentsListScreenState extends State<DocumentsListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Company Documents',
+          'Мои документы',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
@@ -46,6 +46,10 @@ class _DocumentsListScreenState extends State<DocumentsListScreen> {
             )
           : viewModel.errorMessage != null
           ? Center(child: Text(viewModel.errorMessage!))
+          : viewModel.documents.isEmpty
+          ? const Center(
+              child: Text('У вас пока нет документов. Создайте первый!'),
+            )
           : AnimationLimiter(
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),

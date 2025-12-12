@@ -43,7 +43,7 @@ class _CreateDocumentContent extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'New Document',
+          'Новый документ',
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: colorScheme.onSurface,
@@ -67,19 +67,19 @@ class _CreateDocumentContent extends StatelessWidget {
               const SizedBox(height: 32),
 
               // File Upload Section
-              _buildLabel('Attach File *', colorScheme),
+              _buildLabel('Прикрепить файл *', colorScheme),
               const SizedBox(height: 12),
               _buildFileUploadSection(context, viewModel, colorScheme),
               const SizedBox(height: 24),
 
               // Name Field
-              _buildLabel('Document Name', colorScheme),
+              _buildLabel('Название документа', colorScheme),
               const SizedBox(height: 12),
               TextFormField(
                 controller: viewModel.nameController,
                 decoration: _buildInputDecoration(
                   context,
-                  'e.g. Service Agreement',
+                  'напр. Договор на оказание услуг',
                   colorScheme,
                 ),
                 style: TextStyle(color: colorScheme.onSurface),
@@ -87,14 +87,14 @@ class _CreateDocumentContent extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Summary Field
-              _buildLabel('Summary', colorScheme),
+              _buildLabel('Описание', colorScheme),
               const SizedBox(height: 12),
               TextFormField(
                 controller: viewModel.summaryController,
                 maxLines: 3,
                 decoration: _buildInputDecoration(
                   context,
-                  'Brief description...',
+                  'Краткое описание...',
                   colorScheme,
                 ),
                 style: TextStyle(color: colorScheme.onSurface),
@@ -102,7 +102,7 @@ class _CreateDocumentContent extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Type Selector
-              _buildLabel('Document Type', colorScheme),
+              _buildLabel('Тип документа', colorScheme),
               const SizedBox(height: 12),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -136,7 +136,7 @@ class _CreateDocumentContent extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Expiration Date
-              _buildLabel('Expiration Date', colorScheme),
+              _buildLabel('Дата истечения', colorScheme),
               const SizedBox(height: 12),
               TextFormField(
                 readOnly: true,
@@ -165,7 +165,7 @@ class _CreateDocumentContent extends StatelessWidget {
                 decoration:
                     _buildInputDecoration(
                       context,
-                      'Select Date',
+                      'Выбрать дату',
                       colorScheme,
                     ).copyWith(
                       suffixIcon: Icon(
@@ -174,7 +174,7 @@ class _CreateDocumentContent extends StatelessWidget {
                       ),
                       hintText: viewModel.selectedDate != null
                           ? DateFormat.yMMMd().format(viewModel.selectedDate!)
-                          : 'Select Date',
+                          : 'Выбрать дату',
                       hintStyle: TextStyle(
                         color: viewModel.selectedDate != null
                             ? colorScheme.onSurface
@@ -206,7 +206,7 @@ class _CreateDocumentContent extends StatelessWidget {
                           context.pop();
                           UiUtils.showCustomSnackBar(
                             context,
-                            'Document created successfully',
+                            'Документ успешно создан',
                           );
                         }
                       },
@@ -237,7 +237,7 @@ class _CreateDocumentContent extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Create Document',
+                                'Создать документ',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -313,7 +313,7 @@ class _CreateDocumentContent extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Tap to attach file or take photo',
+              'Нажмите, чтобы прикрепить файл или сделать фото',
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 14,
@@ -322,7 +322,7 @@ class _CreateDocumentContent extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Supported: JPG, PNG, PDF',
+              'Поддерживается: JPG, PNG, PDF',
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                 fontSize: 12,
@@ -440,7 +440,7 @@ class _CreateDocumentContent extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Select File Source',
+              'Выберите источник файла',
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -449,8 +449,8 @@ class _CreateDocumentContent extends StatelessWidget {
             _buildSourceOption(
               context,
               icon: Icons.camera_alt_outlined,
-              title: 'Camera',
-              subtitle: 'Take a photo',
+              title: 'Камера',
+              subtitle: 'Сделать фото',
               onTap: () {
                 Navigator.pop(context);
                 viewModel.pickImageFromCamera();
@@ -460,8 +460,8 @@ class _CreateDocumentContent extends StatelessWidget {
             _buildSourceOption(
               context,
               icon: Icons.photo_library_outlined,
-              title: 'Gallery',
-              subtitle: 'Choose from photos',
+              title: 'Галерея',
+              subtitle: 'Выбрать из фотографий',
               onTap: () {
                 Navigator.pop(context);
                 viewModel.pickImageFromGallery();
@@ -471,8 +471,8 @@ class _CreateDocumentContent extends StatelessWidget {
             _buildSourceOption(
               context,
               icon: Icons.insert_drive_file_outlined,
-              title: 'Files',
-              subtitle: 'Browse documents',
+              title: 'Файлы',
+              subtitle: 'Выбрать документ',
               onTap: () {
                 Navigator.pop(context);
                 viewModel.pickDocument();

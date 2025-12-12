@@ -294,7 +294,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                       onTap: () => context.push('/documents'),
                     ),
                     const Text(
-                      'Scan Document',
+                      'Отсканировать QR',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -395,7 +395,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                       onPressed: () {
                         viewModel.resetScanner();
                       },
-                      child: const Text('Retry Permission'),
+                      child: const Text('Повторить запрос'),
                     ),
                   ],
                 ),

@@ -46,7 +46,7 @@ class _LocalAuthScreenState extends State<LocalAuthScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                viewModel.isSetupMode ? 'Create a PIN' : 'Enter PIN',
+                viewModel.isSetupMode ? 'Создайте PIN' : 'Введите PIN',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -60,7 +60,7 @@ class _LocalAuthScreenState extends State<LocalAuthScreen> {
                   style: TextStyle(color: Theme.of(context).statusError),
                 )
               else
-                const Text('Secure your digital documents'),
+                const Text('Защитите свои цифровые документы'),
 
               const SizedBox(height: 32),
 

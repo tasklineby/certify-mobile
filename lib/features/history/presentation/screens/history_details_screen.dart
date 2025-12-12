@@ -83,6 +83,7 @@ class HistoryDetailsScreen extends StatelessWidget {
                   _getStatusText(result.status),
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontSize: 22,
                     color: isDark
                         ? AppColors.textPrimaryDark
                         : AppColors.textPrimaryLight,
@@ -115,25 +116,25 @@ class HistoryDetailsScreen extends StatelessWidget {
                       children: [
                         _buildInfoRow(
                           context,
-                          'Scanned Date',
+                          'Дата сканирования',
                           result.timestamp != null
                               ? DateFormat(
                                   'MMM dd, hh:mm a',
                                 ).format(result.timestamp!)
-                              : 'Unknown',
+                              : 'Неизвестно',
                           Icons.calendar_today_rounded,
                         ),
                         SizedBox(height: 36),
                         _buildInfoRow(
                           context,
-                          'Document ID',
+                          'Идентификатор документа',
                           result.documentId ?? 'N/A',
                           Icons.fingerprint_rounded,
                         ),
                         SizedBox(height: 36),
                         _buildInfoRow(
                           context,
-                          'Message',
+                          'Сообщение',
                           result.message,
                           Icons.info_outline_rounded,
                         ),
@@ -141,7 +142,7 @@ class HistoryDetailsScreen extends StatelessWidget {
                             result.metadata!.isNotEmpty) ...[
                           SizedBox(height: 36),
                           Text(
-                            'Additional Data',
+                            'Дополнительные данные',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -199,7 +200,7 @@ class HistoryDetailsScreen extends StatelessWidget {
               ),
             ),
             child: const Text(
-              'Close',
+              'Закрыть',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
@@ -299,13 +300,13 @@ class HistoryDetailsScreen extends StatelessWidget {
   String _getStatusText(VerificationStatus status) {
     switch (status) {
       case VerificationStatus.valid:
-        return 'Valid Document';
+        return 'Действительный документ';
       case VerificationStatus.warning:
-        return 'Needs Attention';
+        return 'Требует внимания';
       case VerificationStatus.invalid:
-        return 'Invalid Document';
+        return 'Недействительный документ';
       case VerificationStatus.unknown:
-        return 'Unknown Status';
+        return 'Неизвестный статус';
     }
   }
 }

@@ -104,7 +104,7 @@ class _ComparisonResultSheetState extends State<ComparisonResultSheet>
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
-            'Comparison Result',
+            'Результат сравнения',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -140,7 +140,7 @@ class _ComparisonResultSheetState extends State<ComparisonResultSheet>
                             ),
                           ),
                           const Text(
-                            'Match',
+                            'Совпадение',
                             style: TextStyle(
                               fontSize: 16,
                               color: AppColors.textSecondaryLight,
@@ -212,7 +212,7 @@ class _ComparisonResultSheetState extends State<ComparisonResultSheet>
                 elevation: 0,
               ),
               child: const Text(
-                'Done',
+                'Готово',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
